@@ -19,13 +19,24 @@ export class Service {
 
   opts = [];
 
+  userIdOpts = [];
+
   getData() {
-    console.log("LIAM");
+    console.log("GETTING TITLE");
     return this.opts.length
       ? of(this.opts)
       : this.http
           .get<any>("https://jsonplaceholder.typicode.com/todos")
           .pipe(tap(data => (this.opts = data)));
+  }
+
+  getUserIdData() {
+    console.log("GETTING DATA");
+    return this.userIdOpts.length
+      ? of(this.userIdOpts)
+      : this.http
+          .get<any>("https://jsonplaceholder.typicode.com/todos")
+          .pipe(tap(data => (this.userIdOpts = data)));
   }
 }
 
@@ -40,7 +51,8 @@ export class Service {
 export class AutocompleteSimpleExample {
   idControl = new FormControl();
   myControl = new FormControl();
-  options = [];
+
+  idoptions = [];
   filteredOptions: Observable<any[]>;
   filteredIdOptions: Observable<any[]>;
 
@@ -54,6 +66,8 @@ export class AutocompleteSimpleExample {
       })
     );
 
+    console.log(this.idControl.valueChanges);
+
     this.filteredIdOptions = this.idControl.valueChanges.pipe(
       startWith(""),
       debounceTime(100),
@@ -64,16 +78,17 @@ export class AutocompleteSimpleExample {
     );
   }
 
-  ngOnInit() {
-    this.filteredOptions = this.service.getData();
-  }
+  ngOnInit() {}
 
   filter(val: string): Observable<any[]> {
     // call the service which makes the http-request
     return this.service.getData().pipe(
       map(response =>
         response.filter(option => {
-          return option.title.toLowerCase().indexOf(val.toLowerCase()) === 0;
+          return (
+            option.title.toLowerCase().indexOf(val.toLowerCase()) === 0 &&
+            option.userId === this.idControl.value
+          );
         })
       )
     );
@@ -81,10 +96,11 @@ export class AutocompleteSimpleExample {
 
   filterUserId(val: string): Observable<any[]> {
     // call the service which makes the http-request
-    return this.service.getData().pipe(
+
+    return this.service.getUserIdData().pipe(
       map(response =>
         response.filter(option => {
-          return option.title.toLowerCase().indexOf(val.toLowerCase()) === 0;
+          return option.userId === val;
         })
       )
     );
