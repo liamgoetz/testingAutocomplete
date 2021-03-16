@@ -1,21 +1,31 @@
-import { Component, Injectable } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of, Subscription } from 'rxjs';
-import { tap, startWith, debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
+import { Component, Injectable } from "@angular/core";
+import { FormControl } from "@angular/forms";
+import { HttpClient } from "@angular/common/http";
+import { Observable, of, Subscription } from "rxjs";
+import {
+  tap,
+  startWith,
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+  map
+} from "rxjs/operators";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class Service {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   opts = [];
 
   getData() {
-    return this.opts.length ?
-      of(this.opts) :
-      this.http.get<any>('https://jsonplaceholder.typicode.com/users').pipe(tap(data => this.opts = data))
+    console.log("LIAM");
+    return this.opts.length
+      ? of(this.opts)
+      : this.http
+          .get<any>("https://jsonplaceholder.typicode.com/todos")
+          .pipe(tap(data => (this.opts = data)));
   }
 }
 
@@ -23,41 +33,63 @@ export class Service {
  * @title Simple autocomplete
  */
 @Component({
-  selector: 'autocomplete-simple-example',
-  templateUrl: 'autocomplete-simple-example.html',
-  styleUrls: ['autocomplete-simple-example.css'],
+  selector: "autocomplete-simple-example",
+  templateUrl: "autocomplete-simple-example.html",
+  styleUrls: ["autocomplete-simple-example.css"]
 })
 export class AutocompleteSimpleExample {
+  idControl = new FormControl();
   myControl = new FormControl();
   options = [];
   filteredOptions: Observable<any[]>;
+  filteredIdOptions: Observable<any[]>;
 
   constructor(private service: Service) {
-     this.filteredOptions = this.myControl.valueChanges.pipe(
-      startWith(''),
-      debounceTime(400),
+    this.filteredOptions = this.myControl.valueChanges.pipe(
+      startWith(""),
+      debounceTime(100),
       distinctUntilChanged(),
       switchMap(val => {
-            return this.filter(val || '')
-       }) 
-    )
-   }
+        return this.filter(val || "");
+      })
+    );
+
+    this.filteredIdOptions = this.idControl.valueChanges.pipe(
+      startWith(""),
+      debounceTime(100),
+      distinctUntilChanged(),
+      switchMap(val => {
+        return this.filterUserId(val || "");
+      })
+    );
+  }
 
   ngOnInit() {
-   
+    this.filteredOptions = this.service.getData();
   }
 
   filter(val: string): Observable<any[]> {
     // call the service which makes the http-request
-    return this.service.getData()
-     .pipe(
-       map(response => response.filter(option => { 
-         return option.name.toLowerCase().indexOf(val.toLowerCase()) === 0
-       }))
-     )
-   }  
-}
+    return this.service.getData().pipe(
+      map(response =>
+        response.filter(option => {
+          return option.title.toLowerCase().indexOf(val.toLowerCase()) === 0;
+        })
+      )
+    );
+  }
 
+  filterUserId(val: string): Observable<any[]> {
+    // call the service which makes the http-request
+    return this.service.getData().pipe(
+      map(response =>
+        response.filter(option => {
+          return option.title.toLowerCase().indexOf(val.toLowerCase()) === 0;
+        })
+      )
+    );
+  }
+}
 
 /**  Copyright 2019 Google Inc. All Rights Reserved.
     Use of this source code is governed by an MIT-style license that

@@ -1,13 +1,28 @@
 <form class="example-form">
+
   <mat-form-field class="example-full-width">
-    <input type="text" placeholder="Pick one" aria-label="Number" matInput [formControl]="myControl" [matAutocomplete]="auto">
+    <input type="text" placeholder="Pick a User Id" aria-label="Number" matInput [formControl]="idControl" [matAutocomplete]="auto">
     <mat-autocomplete #auto="matAutocomplete">
-      <mat-option *ngFor="let option of filteredOptions | async" [value]="option.name">
-        {{option.name}}
+      <mat-option *ngFor="let option of filteredOptions | async" [value]="option.userId">
+        {{option.userId}}
       </mat-option>
     </mat-autocomplete>
   </mat-form-field>
+
+  <mat-form-field class="example-full-width">
+    <input type="text" placeholder="Pick a random latin phrase" aria-label="Number" matInput [formControl]="myControl" [matAutocomplete]="auto">
+    <mat-autocomplete #auto="matAutocomplete">
+      <mat-option *ngFor="let option of filteredOptions | async" [value]="option.title">
+        {{option.title}}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+
 </form>
+
+<div *ngFor="let item of opts" [id]="item.title">
+  {{item.title}}
+</div>
 
 
 <!-- Copyright 2019 Google Inc. All Rights Reserved.
